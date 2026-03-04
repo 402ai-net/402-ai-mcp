@@ -1,11 +1,11 @@
-# alittlebitofmoney-mcp: Research + Implementation Spec
+# 402ai-mcp: Research + Implementation Spec
 
 Date: February 24, 2026 (US)
 
 ## 1) Objective
-Build an MCP server named `alittlebitofmoney-mcp` that:
+Build an MCP server named `402ai-mcp` that:
 
-- Pulls and tracks `https://alittlebitofmoney.com/api/catalog`.
+- Pulls and tracks `https://402ai.net/api/catalog`.
 - Exposes a strategic toolbox (not a noisy 1:1 endpoint dump).
 - Calls paid ALBOM API endpoints reliably with bearer auth.
 - Updates tool definitions when catalog changes.
@@ -141,7 +141,7 @@ This gives predictable behavior and avoids accidental over-pruning.
 ### 4.1 Configuration
 Environment variables:
 
-- `ALBOM_BASE_URL` (default `https://alittlebitofmoney.com`)
+- `ALBOM_BASE_URL` (default `https://402ai.net`)
 - `ALBOM_BEARER_TOKEN` (optional but strongly recommended)
 - `ALBOM_TOOL_PROFILE` (`compact` default, `full` optional)
 - `ALBOM_INCLUDE_MODERATION` (`true` default in full, `false` default in compact)
@@ -358,8 +358,8 @@ Map upstream -> MCP result consistently:
 
 ## Sources
 
-- Catalog endpoint (live): [https://alittlebitofmoney.com/api/catalog](https://alittlebitofmoney.com/api/catalog)
-- Health endpoint (live): [https://alittlebitofmoney.com/health](https://alittlebitofmoney.com/health)
+- Catalog endpoint (live): [https://402ai.net/api/catalog](https://402ai.net/api/catalog)
+- Health endpoint (live): [https://402ai.net/health](https://402ai.net/health)
 - MCP lifecycle (2025-11-25): [https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
 - MCP transports (2025-11-25): [https://modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
 - MCP tools (2025-11-25): [https://modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)

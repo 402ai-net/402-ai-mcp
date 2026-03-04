@@ -1,6 +1,6 @@
-# alittlebitofmoney-mcp
+# 402ai-mcp
 
-MCP (Model Context Protocol) server for [alittlebitofmoney.com](https://alittlebitofmoney.com) - a Lightning-paid API proxy. Provides catalog-aware tools with compact/full profiles, bearer-first authentication, and dynamic tool refresh notifications.
+MCP (Model Context Protocol) server for [402ai.net](https://402ai.net) - a Lightning-paid API proxy. Provides catalog-aware tools with compact/full profiles, bearer-first authentication, and dynamic tool refresh notifications.
 
 **Please update me when there are feature changes.**
 
@@ -33,7 +33,7 @@ ALBOM_BEARER_TOKEN=<your_token> npm start
 ### NPM Package
 
 ```bash
-npm install alittlebitofmoney-mcp
+npm install 402ai-mcp
 ```
 
 ## Configuration
@@ -42,7 +42,7 @@ Configure via environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ALBOM_BASE_URL` | `https://alittlebitofmoney.com` | API base URL |
+| `ALBOM_BASE_URL` | `https://402ai.net` | API base URL |
 | `ALBOM_BEARER_TOKEN` | _(none)_ | Prepaid balance token (strongly recommended) |
 | `ALBOM_TOOL_PROFILE` | `compact` | Tool profile: `compact` or `full` |
 | `ALBOM_INCLUDE_MODERATION` | `false` (compact), `true` (full) | Include moderation tools |
@@ -103,12 +103,12 @@ Set `ALBOM_BEARER_TOKEN` to your prepaid balance token. All requests will use `A
 **Get a token**:
 ```bash
 # 1. Create topup invoice
-curl -X POST https://alittlebitofmoney.com/topup \
+curl -X POST https://402ai.net/topup \
   -H "Content-Type: application/json" \
   -d '{"amount_sats":1000}'
 
 # 2. Pay invoice with Lightning wallet, then claim
-curl -X POST https://alittlebitofmoney.com/topup/claim \
+curl -X POST https://402ai.net/topup/claim \
   -H "Content-Type: application/json" \
   -d '{"preimage":"<hex-preimage>"}'
 ```
@@ -126,9 +126,9 @@ Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "alittlebitofmoney": {
+    "402ai": {
       "command": "node",
-      "args": ["/path/to/alittlebitofmoney-mcp/dist/server.js"],
+      "args": ["/path/to/402ai-mcp/dist/server.js"],
       "env": {
         "ALBOM_BEARER_TOKEN": "abl_your_token_here",
         "ALBOM_TOOL_PROFILE": "compact"
@@ -141,10 +141,10 @@ Add to `claude_desktop_config.json`:
 ### Programmatic Usage
 
 ```typescript
-import { createAlbomServer } from 'alittlebitofmoney-mcp';
+import { createAlbomServer } from '402ai-mcp';
 
 const server = createAlbomServer({
-  baseUrl: 'https://alittlebitofmoney.com',
+  baseUrl: 'https://402ai.net',
   bearerToken: process.env.ALBOM_BEARER_TOKEN,
   toolProfile: 'compact'
 });
@@ -266,10 +266,10 @@ npm publish --access public
 ├── test/                  # Test suite
 ├── scripts/               # Utility scripts
 ├── dist/                  # Compiled output
-└── ALITTLEBITOFMONEY_MCP_IMPLEMENTATION_SPEC.md  # Design spec
+└── 402AI_MCP_IMPLEMENTATION_SPEC.md  # Design spec
 
 Documentation:
-└── ALITTLEBITOFMONEY_MCP_IMPLEMENTATION_SPEC.md
+└── 402AI_MCP_IMPLEMENTATION_SPEC.md
 ```
 
 ## MCP Specification

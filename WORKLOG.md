@@ -1,6 +1,6 @@
 # WORKLOG
 
-Development history and feature changes for alittlebitofmoney-mcp.
+Development history and feature changes for 402ai-mcp.
 
 ## 2026-02-24
 
