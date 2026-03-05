@@ -200,9 +200,9 @@ export function summarizeResult(result: AlbomToolResult): string {
 }
 
 export function resolvePriceSats(endpoint: {
-  priceType: "per_model" | "flat";
+  priceType: string;
   flatPriceSats?: number;
-  modelPrices: Record<string, { price_sats: number }>;
+  modelPrices: Record<string, { price_sats?: number }>;
   defaultModel?: string;
 }): (model?: string) => number | undefined {
   return (model?: string): number | undefined => {
@@ -210,16 +210,16 @@ export function resolvePriceSats(endpoint: {
       return endpoint.flatPriceSats;
     }
 
-    if (model && endpoint.modelPrices[model]) {
+    if (model && typeof endpoint.modelPrices[model]?.price_sats === "number") {
       return endpoint.modelPrices[model].price_sats;
     }
 
-    if (endpoint.modelPrices._default) {
+    if (typeof endpoint.modelPrices._default?.price_sats === "number") {
       return endpoint.modelPrices._default.price_sats;
     }
 
     const defaultPricing = endpoint.defaultModel ? endpoint.modelPrices[endpoint.defaultModel] : undefined;
-    if (defaultPricing) {
+    if (typeof defaultPricing?.price_sats === "number") {
       return defaultPricing.price_sats;
     }
 

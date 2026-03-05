@@ -3,12 +3,24 @@ import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 export type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 
 export type ToolProfile = "compact" | "full";
-export type PriceType = "per_model" | "flat";
+export type PriceType =
+  | "per_model"
+  | "flat"
+  | "token_usage"
+  | "image_generation"
+  | "tts"
+  | "audio_transcription"
+  | "video_generation"
+  | "embedding";
 export type EndpointContentType = "json" | "multipart";
 
 export interface CatalogModelPrice {
-  price_sats: number;
+  price_sats?: number;
   price_usd_cents?: number;
+  max_output_tokens?: number;
+  input_usd_per_mtok?: number;
+  output_usd_per_mtok?: number;
+  [key: string]: unknown;
 }
 
 export interface CatalogEndpointExample {

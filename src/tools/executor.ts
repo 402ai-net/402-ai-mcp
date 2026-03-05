@@ -125,7 +125,7 @@ export class AlbomToolExecutor {
     return {
       ok: true,
       status: 200,
-      endpoint: "/api/catalog",
+      endpoint: "/api/v1/catalog",
       data: {
         catalog: catalog.raw,
         normalized_summary: catalog.summary,

@@ -62,7 +62,7 @@ Optimized for AI agents with minimal tool ambiguity. Consolidates overlapping en
 
 | Tool | Purpose | Maps to Endpoint |
 |------|---------|------------------|
-| `albom_catalog_get` | Get live API catalog | `/api/catalog` |
+| `albom_catalog_get` | Get live API catalog | `/api/v1/catalog` |
 | `albom_text_generate` | Generate text completions | `/v1/responses` |
 | `albom_image_generate` | Generate images | `/v1/images/generations` |
 | `albom_image_edit` | Edit images | `/v1/images/edits` |
@@ -103,12 +103,12 @@ Set `ALBOM_BEARER_TOKEN` to your prepaid balance token. All requests will use `A
 **Get a token**:
 ```bash
 # 1. Create topup invoice
-curl -X POST https://402ai.net/topup \
+curl -X POST https://402ai.net/api/v1/topup \
   -H "Content-Type: application/json" \
   -d '{"amount_sats":1000}'
 
 # 2. Pay invoice with Lightning wallet, then claim
-curl -X POST https://402ai.net/topup/claim \
+curl -X POST https://402ai.net/api/v1/topup/claim \
   -H "Content-Type: application/json" \
   -d '{"preimage":"<hex-preimage>"}'
 ```
@@ -185,7 +185,7 @@ ALBOM_BEARER_TOKEN=<token> npm run smoke:live
 
 ### Core Modules
 
-- **`catalog.ts`**: Fetches and validates `/api/catalog`, detects changes
+- **`catalog.ts`**: Fetches and validates `/api/v1/catalog`, detects changes
 - **`config.ts`**: Environment variable configuration and validation
 - **`dedup.ts`**: Model set deduplication logic (Jaccard similarity)
 - **`httpClient.ts`**: HTTP client with retry logic, multipart support, bearer auth
@@ -196,7 +196,7 @@ ALBOM_BEARER_TOKEN=<token> npm run smoke:live
 
 ### Catalog Sync
 
-1. Fetches `/api/catalog` on startup
+1. Fetches `/api/v1/catalog` on startup
 2. Caches for `ALBOM_CATALOG_TTL_MS`
 3. Periodically refreshes and compares
 4. Sends `notifications/tools/list_changed` if catalog changes

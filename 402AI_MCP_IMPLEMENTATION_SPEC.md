@@ -5,7 +5,7 @@ Date: February 24, 2026 (US)
 ## 1) Objective
 Build an MCP server named `402ai-mcp` that:
 
-- Pulls and tracks `https://402ai.net/api/catalog`.
+- Pulls and tracks `https://402ai.net/api/v1/catalog`.
 - Exposes a strategic toolbox (not a noisy 1:1 endpoint dump).
 - Calls paid ALBOM API endpoints reliably with bearer auth.
 - Updates tool definitions when catalog changes.
@@ -15,7 +15,7 @@ Primary user concern addressed: avoid too many overlapping tools while preservin
 ## 2) Research Findings
 
 ### 2.1 Live API Catalog Snapshot (verified)
-Snapshot time: February 24, 2026, ~05:47 UTC from `/api/catalog`.
+Snapshot time: February 24, 2026, ~05:47 UTC from `/api/v1/catalog`.
 
 - APIs: 1 (`openai`)
 - Endpoints: 11 total
@@ -156,7 +156,7 @@ Environment variables:
 
 On startup:
 
-1. Fetch `/api/catalog`.
+1. Fetch `/api/v1/catalog`.
 2. Validate expected shape (`apis`, `endpoints`, pricing fields).
 3. Build internal `CatalogState` and derived `ToolState`.
 
@@ -194,7 +194,7 @@ Error shape:
     "amount_sats": 30,
     "invoice": "lnbc...",
     "payment_hash": "...",
-    "topup_url": "/topup"
+    "topup_url": "/api/v1/topup"
   }
 }
 ```
@@ -358,7 +358,7 @@ Map upstream -> MCP result consistently:
 
 ## Sources
 
-- Catalog endpoint (live): [https://402ai.net/api/catalog](https://402ai.net/api/catalog)
+- Catalog endpoint (live): [https://402ai.net/api/v1/catalog](https://402ai.net/api/v1/catalog)
 - Health endpoint (live): [https://402ai.net/health](https://402ai.net/health)
 - MCP lifecycle (2025-11-25): [https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
 - MCP transports (2025-11-25): [https://modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)

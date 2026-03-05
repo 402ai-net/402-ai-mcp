@@ -4,7 +4,7 @@ import { sha256Hex, stableStringify } from "./utils.js";
 
 const modelPriceSchema = z
   .object({
-    price_sats: z.number(),
+    price_sats: z.number().optional(),
     price_usd_cents: z.number().optional()
   })
   .passthrough();
@@ -13,7 +13,7 @@ const endpointSchema = z
   .object({
     path: z.string(),
     method: z.string(),
-    price_type: z.enum(["per_model", "flat"]),
+    price_type: z.string(),
     description: z.string().optional(),
     example: z
       .object({
@@ -62,9 +62,9 @@ export function parseCatalog(input: unknown): CatalogResponse {
 
   for (const api of Object.values(parsed.apis)) {
     for (const endpoint of api.endpoints) {
-      if (endpoint.price_type === "per_model") {
+      if (endpoint.price_type !== "flat") {
         if (!endpoint.models || Object.keys(endpoint.models).length === 0) {
-          throw new Error(`Catalog endpoint ${endpoint.path} is per_model but has no models`);
+          throw new Error(`Catalog endpoint ${endpoint.path} is ${endpoint.price_type} but has no models`);
         }
       }
 
@@ -155,7 +155,7 @@ export function normalizeCatalog(catalog: CatalogResponse, fetchedAt = new Date(
         apiName: api.name,
         path: endpoint.path,
         method: endpoint.method.toUpperCase(),
-        priceType: endpoint.price_type,
+        priceType: endpoint.price_type as EndpointDescriptor["priceType"],
         description: endpoint.description ?? `${endpoint.method.toUpperCase()} ${endpoint.path}`,
         contentType,
         argumentKeys,
@@ -202,7 +202,7 @@ export function normalizeCatalog(catalog: CatalogResponse, fetchedAt = new Date(
     summary: {
       apiCount: Object.keys(catalog.apis).length,
       endpointCount: endpoints.length,
-      perModelCount: endpoints.filter((endpoint) => endpoint.priceType === "per_model").length,
+      perModelCount: endpoints.filter((endpoint) => endpoint.priceType !== "flat").length,
       flatCount: endpoints.filter((endpoint) => endpoint.priceType === "flat").length,
       endpointPaths: endpoints.map((endpoint) => endpoint.path),
       modelCountsByPath: Object.fromEntries(endpoints.map((endpoint) => [endpoint.path, endpoint.models.length]))
@@ -223,7 +223,7 @@ export async function fetchCatalog(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetchFn(`${baseUrl}/api/catalog`, {
+    const response = await fetchFn(`${baseUrl}/api/v1/catalog`, {
       method: "GET",
       headers: {
         Accept: "application/json"
