@@ -94,6 +94,21 @@ export interface CatalogState {
 interface PlannedToolBase {
   kind:
     | "catalog_get"
+    | "marketplace_list_tasks"
+    | "marketplace_get_task"
+    | "marketplace_post_task"
+    | "marketplace_quote_task"
+    | "marketplace_update_quote"
+    | "marketplace_accept_quote"
+    | "marketplace_list_quote_messages"
+    | "marketplace_send_quote_message"
+    | "marketplace_submit_result"
+    | "marketplace_confirm_delivery"
+    | "marketplace_get_my_account"
+    | "marketplace_list_workers"
+    | "marketplace_get_worker_profile"
+    | "marketplace_upsert_profile"
+    | "marketplace_review_task"
     | "text_generate"
     | "image_generate"
     | "image_edit"
@@ -112,6 +127,70 @@ interface PlannedToolBase {
 
 export interface CatalogGetTool extends PlannedToolBase {
   kind: "catalog_get";
+}
+
+export interface MarketplaceToolBase extends PlannedToolBase {
+  endpointPath: string;
+}
+
+export interface MarketplaceListTasksTool extends MarketplaceToolBase {
+  kind: "marketplace_list_tasks";
+}
+
+export interface MarketplaceGetTaskTool extends MarketplaceToolBase {
+  kind: "marketplace_get_task";
+}
+
+export interface MarketplacePostTaskTool extends MarketplaceToolBase {
+  kind: "marketplace_post_task";
+}
+
+export interface MarketplaceQuoteTaskTool extends MarketplaceToolBase {
+  kind: "marketplace_quote_task";
+}
+
+export interface MarketplaceUpdateQuoteTool extends MarketplaceToolBase {
+  kind: "marketplace_update_quote";
+}
+
+export interface MarketplaceAcceptQuoteTool extends MarketplaceToolBase {
+  kind: "marketplace_accept_quote";
+}
+
+export interface MarketplaceListQuoteMessagesTool extends MarketplaceToolBase {
+  kind: "marketplace_list_quote_messages";
+}
+
+export interface MarketplaceSendQuoteMessageTool extends MarketplaceToolBase {
+  kind: "marketplace_send_quote_message";
+}
+
+export interface MarketplaceSubmitResultTool extends MarketplaceToolBase {
+  kind: "marketplace_submit_result";
+}
+
+export interface MarketplaceConfirmDeliveryTool extends MarketplaceToolBase {
+  kind: "marketplace_confirm_delivery";
+}
+
+export interface MarketplaceGetMyAccountTool extends MarketplaceToolBase {
+  kind: "marketplace_get_my_account";
+}
+
+export interface MarketplaceListWorkersTool extends MarketplaceToolBase {
+  kind: "marketplace_list_workers";
+}
+
+export interface MarketplaceGetWorkerProfileTool extends MarketplaceToolBase {
+  kind: "marketplace_get_worker_profile";
+}
+
+export interface MarketplaceUpsertProfileTool extends MarketplaceToolBase {
+  kind: "marketplace_upsert_profile";
+}
+
+export interface MarketplaceReviewTaskTool extends MarketplaceToolBase {
+  kind: "marketplace_review_task";
 }
 
 export interface TextGenerateTool extends PlannedToolBase {
@@ -168,6 +247,21 @@ export interface RawCallTool extends PlannedToolBase {
 
 export type PlannedTool =
   | CatalogGetTool
+  | MarketplaceListTasksTool
+  | MarketplaceGetTaskTool
+  | MarketplacePostTaskTool
+  | MarketplaceQuoteTaskTool
+  | MarketplaceUpdateQuoteTool
+  | MarketplaceAcceptQuoteTool
+  | MarketplaceListQuoteMessagesTool
+  | MarketplaceSendQuoteMessageTool
+  | MarketplaceSubmitResultTool
+  | MarketplaceConfirmDeliveryTool
+  | MarketplaceGetMyAccountTool
+  | MarketplaceListWorkersTool
+  | MarketplaceGetWorkerProfileTool
+  | MarketplaceUpsertProfileTool
+  | MarketplaceReviewTaskTool
   | TextGenerateTool
   | ImageGenerateTool
   | ImageEditTool
@@ -185,6 +279,19 @@ export interface ToolState {
   signature: string;
 }
 
+export interface AutoTopupInfo {
+  attempted: boolean;
+  triggered: boolean;
+  status: "succeeded" | "failed" | "skipped";
+  reason?: string;
+  threshold_sats: number;
+  topup_usd: number;
+  balance_sats?: number;
+  previous_balance_sats?: number;
+  new_balance_sats?: number;
+  error?: string;
+}
+
 export interface AlbomSuccess<T = unknown> {
   ok: true;
   status: number;
@@ -192,6 +299,7 @@ export interface AlbomSuccess<T = unknown> {
   model?: string;
   price_sats?: number;
   data: T;
+  auto_topup?: AutoTopupInfo;
 }
 
 export interface AlbomErrorPayload {
@@ -206,6 +314,7 @@ export interface AlbomError {
   endpoint: string;
   model?: string;
   error: AlbomErrorPayload;
+  auto_topup?: AutoTopupInfo;
 }
 
 export type AlbomToolResult<T = unknown> = AlbomSuccess<T> | AlbomError;

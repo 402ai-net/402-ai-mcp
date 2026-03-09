@@ -1,12 +1,12 @@
 {
-  "name": "alittlebitofmoney-mcp",
+  "name": "402ai-mcp",
   "version": "1.0.0",
-  "description": "MCP server for ALBOM catalog-aware paid OpenAI proxy tools",
+  "description": "MCP server for 402ai.net - Lightning-paid OpenAI proxy tools",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "alittlebitofmoney-mcp": "./dist/server.js"
+    "402ai-mcp": "dist/server.js"
   },
   "exports": {
     ".": {
@@ -36,14 +36,17 @@
   },
   "keywords": [
     "mcp",
-    "alittlebitofmoney",
+    "402ai",
     "openai",
+    "lightning",
     "server"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.0",
+    "@getalby/sdk": "^7.0.0",
+    "websocket-polyfill": "^1.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

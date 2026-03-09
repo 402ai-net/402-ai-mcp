@@ -2,6 +2,7 @@ export * from "./config.js";
 export * from "./catalog.js";
 export * from "./dedup.js";
 export * from "./httpClient.js";
+export * from "./autoTopup.js";
 export * from "./results.js";
 export * from "./types.js";
 export * from "./tools/executor.js";

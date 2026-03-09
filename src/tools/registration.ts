@@ -36,6 +36,102 @@ function toolInputSchema(tool: PlannedTool): z.ZodRawShape {
         refresh: z.boolean().optional().describe("If true, force a fresh catalog pull before returning")
       };
 
+    case "marketplace_get_my_account":
+      return {};
+
+    case "marketplace_list_tasks":
+      return {
+        status: z.enum(["open", "in_escrow", "delivered", "completed", "cancelled"]).optional()
+      };
+
+    case "marketplace_get_task":
+      return {
+        task_id: z.string()
+      };
+
+    case "marketplace_post_task":
+      return {
+        title: z.string(),
+        description: z.string().optional(),
+        budget_sats: z.number().int().positive()
+      };
+
+    case "marketplace_quote_task":
+      return {
+        task_id: z.string(),
+        price_sats: z.number().int().positive(),
+        description: z.string().optional()
+      };
+
+    case "marketplace_update_quote":
+      return {
+        task_id: z.string(),
+        quote_id: z.string(),
+        price_sats: z.number().int().positive().optional(),
+        description: z.string().optional()
+      };
+
+    case "marketplace_accept_quote":
+      return {
+        task_id: z.string(),
+        quote_id: z.string()
+      };
+
+    case "marketplace_list_quote_messages":
+      return {
+        task_id: z.string(),
+        quote_id: z.string(),
+        since_id: z.number().int().nonnegative().optional()
+      };
+
+    case "marketplace_send_quote_message":
+      return {
+        task_id: z.string(),
+        quote_id: z.string(),
+        body: z.string()
+      };
+
+    case "marketplace_submit_result":
+      return {
+        task_id: z.string(),
+        filename: z.string().optional(),
+        content_base64: z.string().optional(),
+        notes: z.string().optional()
+      };
+
+    case "marketplace_confirm_delivery":
+      return {
+        task_id: z.string()
+      };
+
+    case "marketplace_list_workers":
+      return {
+        include_inactive: z.boolean().optional()
+      };
+
+    case "marketplace_get_worker_profile":
+      return {
+        account_id: z.string()
+      };
+
+    case "marketplace_upsert_profile":
+      return {
+        display_name: z.string(),
+        actor_type: z.enum(["agent", "human", "hybrid"]).optional(),
+        headline: z.string().optional(),
+        capabilities: z.array(z.string()).optional(),
+        delivery_types: z.array(z.string()).optional(),
+        sample_artifacts: z.array(z.record(z.string(), z.unknown())).optional(),
+        active: z.boolean().optional()
+      };
+
+    case "marketplace_review_task":
+      return {
+        task_id: z.string(),
+        rating: z.number().int().min(1).max(5),
+        review: z.string().optional()
+      };
+
     case "text_generate":
       return {
         model: z.string().describe("Model name"),

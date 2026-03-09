@@ -6,8 +6,12 @@ import { baseCatalog } from "./fixtures.js";
 
 function makeConfig(overrides: Partial<AlbomConfig> = {}): AlbomConfig {
   return {
-    baseUrl: "https://alittlebitofmoney.com",
+    baseUrl: "https://402ai.net",
     bearerToken: "token",
+    nwcUri: undefined,
+    nwcThresholdSats: 1_000,
+    nwcTopupUsd: 2,
+    nwcMaxDailyUsd: 10,
     toolProfile: "compact",
     includeModeration: false,
     includeEmbeddings: false,
@@ -66,5 +70,16 @@ describe("tool profile dedup", () => {
     expect(names).toContain("albom_openai_responses");
     expect(names).toContain("albom_openai_audio_translations");
     expect(names).toContain("albom_catalog_get");
+  });
+
+  it("always includes marketplace tools", () => {
+    const catalog = normalizeCatalog(parseCatalog(baseCatalog()));
+    const toolState = buildToolState(catalog, makeConfig({ toolProfile: "compact" }));
+
+    const names = toolState.tools.map((tool) => tool.name);
+    expect(names).toContain("albom_marketplace_list_tasks");
+    expect(names).toContain("albom_marketplace_post_task");
+    expect(names).toContain("albom_marketplace_list_workers");
+    expect(names).toContain("albom_marketplace_review_task");
   });
 });

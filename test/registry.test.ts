@@ -8,8 +8,12 @@ import { catalogWithPaths } from "./fixtures.js";
 
 function makeConfig(overrides: Partial<AlbomConfig> = {}): AlbomConfig {
   return {
-    baseUrl: "https://alittlebitofmoney.com",
+    baseUrl: "https://402ai.net",
     bearerToken: "token",
+    nwcUri: undefined,
+    nwcThresholdSats: 1_000,
+    nwcTopupUsd: 2,
+    nwcMaxDailyUsd: 10,
     toolProfile: "full",
     includeModeration: true,
     includeEmbeddings: true,
@@ -60,7 +64,7 @@ describe("tool registry", () => {
     };
 
     const httpClient = new AlbomHttpClient({
-      baseUrl: "https://alittlebitofmoney.com",
+      baseUrl: "https://402ai.net",
       bearerToken: "token",
       timeoutMs: 90_000,
       maxRetries: 0,

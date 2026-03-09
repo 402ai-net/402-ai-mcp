@@ -23,6 +23,138 @@ const DEFAULT_ANNOTATION: ToolAnnotations = {
   openWorldHint: true
 };
 
+const MARKETPLACE_READ_ANNOTATION: ToolAnnotations = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  destructiveHint: false,
+  openWorldHint: true
+};
+
+function marketplaceTools(): PlannedTool[] {
+  return [
+    {
+      kind: "marketplace_get_my_account",
+      name: "albom_marketplace_get_my_account",
+      title: "Marketplace Account",
+      description: "Get your AI-for-Hire marketplace account balance and account_id.",
+      endpointPath: "/api/v1/ai-for-hire/me",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_list_tasks",
+      name: "albom_marketplace_list_tasks",
+      title: "Marketplace List Tasks",
+      description: "List marketplace tasks. Optionally filter by status.",
+      endpointPath: "/api/v1/ai-for-hire/tasks",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_get_task",
+      name: "albom_marketplace_get_task",
+      title: "Marketplace Get Task",
+      description: "Get marketplace task detail, including quotes and deliveries.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_post_task",
+      name: "albom_marketplace_post_task",
+      title: "Marketplace Post Task",
+      description: "Post a new marketplace task with title, description, and budget in sats.",
+      endpointPath: "/api/v1/ai-for-hire/tasks",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_quote_task",
+      name: "albom_marketplace_quote_task",
+      title: "Marketplace Quote Task",
+      description: "Submit a quote on a marketplace task.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/quotes",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_update_quote",
+      name: "albom_marketplace_update_quote",
+      title: "Marketplace Update Quote",
+      description: "Update your pending quote price or description.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/quotes/{quote_id}",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_accept_quote",
+      name: "albom_marketplace_accept_quote",
+      title: "Marketplace Accept Quote",
+      description: "Accept a quote and lock escrow for the task.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/quotes/{quote_id}/accept",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_list_quote_messages",
+      name: "albom_marketplace_list_quote_messages",
+      title: "Marketplace List Quote Messages",
+      description: "Read messages on a quote thread you participate in.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/quotes/{quote_id}/messages",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_send_quote_message",
+      name: "albom_marketplace_send_quote_message",
+      title: "Marketplace Send Quote Message",
+      description: "Send a message on a quote thread.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/quotes/{quote_id}/messages",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_submit_result",
+      name: "albom_marketplace_submit_result",
+      title: "Marketplace Submit Result",
+      description: "Deliver task output for an accepted quote.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/deliver",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_confirm_delivery",
+      name: "albom_marketplace_confirm_delivery",
+      title: "Marketplace Confirm Delivery",
+      description: "Confirm delivery and release escrow to the worker.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/confirm",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_list_workers",
+      name: "albom_marketplace_list_workers",
+      title: "Marketplace List Workers",
+      description: "List public worker profiles and reputation summaries.",
+      endpointPath: "/api/v1/ai-for-hire/workers",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_get_worker_profile",
+      name: "albom_marketplace_get_worker_profile",
+      title: "Marketplace Get Worker Profile",
+      description: "Get a worker profile and reputation summary by account_id.",
+      endpointPath: "/api/v1/ai-for-hire/workers/{account_id}",
+      annotations: MARKETPLACE_READ_ANNOTATION
+    },
+    {
+      kind: "marketplace_upsert_profile",
+      name: "albom_marketplace_upsert_profile",
+      title: "Marketplace Upsert Profile",
+      description: "Create or update your worker profile.",
+      endpointPath: "/api/v1/ai-for-hire/me/profile",
+      annotations: DEFAULT_ANNOTATION
+    },
+    {
+      kind: "marketplace_review_task",
+      name: "albom_marketplace_review_task",
+      title: "Marketplace Review Task",
+      description: "Review completed work with a 1-5 rating and optional review text.",
+      endpointPath: "/api/v1/ai-for-hire/tasks/{task_id}/review",
+      annotations: DEFAULT_ANNOTATION
+    }
+  ];
+}
+
 function isTextPath(path: string): boolean {
   return path === "/v1/responses" || path.startsWith("/v1/chat/");
 }
@@ -287,7 +419,8 @@ function buildToolSignature(profile: ToolProfile, tools: PlannedTool[]): string 
 }
 
 export function buildToolState(catalog: CatalogState, config: AlbomConfig): ToolState {
-  const tools = config.toolProfile === "compact" ? makeCompactTools(catalog, config) : makeFullTools(catalog, config);
+  const generatedTools = config.toolProfile === "compact" ? makeCompactTools(catalog, config) : makeFullTools(catalog, config);
+  const tools = [...generatedTools, ...marketplaceTools()];
 
   return {
     profile: config.toolProfile,

@@ -3,6 +3,10 @@ import type { ToolProfile } from "./types.js";
 export interface AlbomConfig {
   baseUrl: string;
   bearerToken?: string;
+  nwcUri?: string;
+  nwcThresholdSats: number;
+  nwcTopupUsd: number;
+  nwcMaxDailyUsd: number;
   toolProfile: ToolProfile;
   includeModeration: boolean;
   includeEmbeddings: boolean;
@@ -15,7 +19,7 @@ export interface AlbomConfig {
 }
 
 const DEFAULTS = {
-  baseUrl: "https://alittlebitofmoney.com",
+  baseUrl: "https://402ai.net",
   catalogTtlMs: 300_000,
   httpTimeoutMs: 90_000,
   maxRetries: 2,
@@ -51,6 +55,19 @@ function parseInteger(value: string | undefined, fallback: number, minimum: numb
   return parsed;
 }
 
+function parseDecimal(value: string | undefined, fallback: number, minimum: number): number {
+  if (value === undefined) {
+    return fallback;
+  }
+
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed) || Number.isNaN(parsed) || parsed < minimum) {
+    throw new Error(`Invalid decimal value: ${value}`);
+  }
+
+  return Math.round(parsed * 100) / 100;
+}
+
 function parseToolProfile(value: string | undefined): ToolProfile {
   if (!value) {
     return "compact";
@@ -77,6 +94,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AlbomConfig {
   return {
     baseUrl: normalizeBaseUrl(env.ALBOM_BASE_URL ?? DEFAULTS.baseUrl),
     bearerToken: env.ALBOM_BEARER_TOKEN?.trim() || undefined,
+    nwcUri: env.ALBOM_NWC_URI?.trim() || undefined,
+    nwcThresholdSats: parseInteger(env.ALBOM_NWC_THRESHOLD_SATS, 1_000, 0),
+    nwcTopupUsd: parseDecimal(env.ALBOM_NWC_TOPUP_USD, 2, 0.01),
+    nwcMaxDailyUsd: parseDecimal(env.ALBOM_NWC_MAX_DAILY, 10, 0.01),
     toolProfile,
     includeModeration: includeModerationFromEnv ?? toolProfile === "full",
     includeEmbeddings: includeEmbeddingsFromEnv ?? toolProfile === "full",

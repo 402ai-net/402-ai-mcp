@@ -8,7 +8,7 @@ import { AlbomHttpClient } from "./httpClient.js";
 import { AlbomToolRegistry } from "./tools/registry.js";
 import { toErrorMessage } from "./utils.js";
 
-const SERVER_NAME = "alittlebitofmoney-mcp";
+const SERVER_NAME = "402ai-mcp";
 const SERVER_VERSION = "1.0.0";
 
 async function main(): Promise<void> {

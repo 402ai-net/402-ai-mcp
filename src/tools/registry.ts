@@ -1,4 +1,5 @@
 import type { AlbomConfig } from "../config.js";
+import { NwcAutoTopupManager } from "../autoTopup.js";
 import { buildToolState } from "../dedup.js";
 import { AlbomHttpClient } from "../httpClient.js";
 import type { CatalogState, ToolState } from "../types.js";
@@ -22,6 +23,7 @@ export class AlbomToolRegistry {
   private readonly server: ToolServerLike;
   private readonly catalogProvider: CatalogProvider;
   private readonly httpClient: AlbomHttpClient;
+  private readonly autoTopupManager?: NwcAutoTopupManager;
 
   private toolState: ToolState | undefined;
   private catalogState: CatalogState | undefined;
@@ -32,6 +34,17 @@ export class AlbomToolRegistry {
     this.server = options.server;
     this.catalogProvider = options.catalogProvider;
     this.httpClient = options.httpClient;
+    if (this.config.nwcUri) {
+      this.autoTopupManager = new NwcAutoTopupManager(
+        {
+          nwcUri: this.config.nwcUri,
+          thresholdSats: this.config.nwcThresholdSats,
+          topupUsd: this.config.nwcTopupUsd,
+          maxDailyUsd: this.config.nwcMaxDailyUsd
+        },
+        this.httpClient
+      );
+    }
   }
 
   public currentToolState(): ToolState | undefined {
@@ -94,7 +107,8 @@ export class AlbomToolRegistry {
         this.catalogState = refreshed;
         return refreshed;
       },
-      getToolState: () => this.toolState
+      getToolState: () => this.toolState,
+      autoTopupManager: this.autoTopupManager
     });
 
     for (const tool of nextToolState.tools) {

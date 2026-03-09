@@ -26,7 +26,11 @@ function normalizeEndpointPath(endpointPath: string): string {
 }
 
 function composeEndpointUrl(baseUrl: string, endpointPath: string): string {
-  return `${baseUrl}/openai${normalizeEndpointPath(endpointPath)}`;
+  const normalized = normalizeEndpointPath(endpointPath);
+  if (normalized.startsWith("/api/")) {
+    return `${baseUrl}${normalized}`;
+  }
+  return `${baseUrl}/openai${normalized}`;
 }
 
 function headersToRecord(headers: Headers): Record<string, string> {
@@ -67,13 +71,23 @@ async function parseResponseData(response: Response): Promise<NormalizedHttpResp
 
 export class AlbomHttpClient {
   private readonly fetchFn: typeof fetch;
+  private bearerToken?: string;
 
   public constructor(private readonly options: HttpClientOptions) {
     this.fetchFn = options.fetchFn ?? globalThis.fetch;
+    this.bearerToken = options.bearerToken;
 
     if (!this.fetchFn) {
       throw new Error("No fetch implementation available");
     }
+  }
+
+  public getBearerToken(): string | undefined {
+    return this.bearerToken;
+  }
+
+  public setBearerToken(token: string | undefined): void {
+    this.bearerToken = token?.trim() || undefined;
   }
 
   public async postJson(
@@ -91,6 +105,47 @@ export class AlbomHttpClient {
     });
 
     return response;
+  }
+
+  public async putJson(
+    endpointPath: string,
+    body: Record<string, unknown>,
+    requestOptions: RequestOptions = {}
+  ): Promise<NormalizedHttpResponse> {
+    const headers = this.resolveHeaders(requestOptions);
+    headers["content-type"] = "application/json";
+
+    return this.requestWithRetries(composeEndpointUrl(this.options.baseUrl, endpointPath), {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(body)
+    });
+  }
+
+  public async patchJson(
+    endpointPath: string,
+    body: Record<string, unknown>,
+    requestOptions: RequestOptions = {}
+  ): Promise<NormalizedHttpResponse> {
+    const headers = this.resolveHeaders(requestOptions);
+    headers["content-type"] = "application/json";
+
+    return this.requestWithRetries(composeEndpointUrl(this.options.baseUrl, endpointPath), {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body)
+    });
+  }
+
+  public async getJson(
+    endpointPath: string,
+    requestOptions: RequestOptions = {}
+  ): Promise<NormalizedHttpResponse> {
+    const headers = this.resolveHeaders(requestOptions);
+    return this.requestWithRetries(composeEndpointUrl(this.options.baseUrl, endpointPath), {
+      method: "GET",
+      headers
+    });
   }
 
   public async postMultipart(
@@ -156,8 +211,8 @@ export class AlbomHttpClient {
       accept: "*/*"
     };
 
-    if (this.options.bearerToken) {
-      headers.authorization = `Bearer ${this.options.bearerToken}`;
+    if (this.bearerToken) {
+      headers.authorization = `Bearer ${this.bearerToken}`;
       return headers;
     }
 

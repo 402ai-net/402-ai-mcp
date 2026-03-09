@@ -44,6 +44,10 @@ Configure via environment variables:
 |----------|---------|-------------|
 | `ALBOM_BASE_URL` | `https://402ai.net` | API base URL |
 | `ALBOM_BEARER_TOKEN` | _(none)_ | Prepaid balance token (strongly recommended) |
+| `ALBOM_NWC_URI` | _(none)_ | Client-side NWC connection URI used to auto-pay topup invoices locally |
+| `ALBOM_NWC_THRESHOLD_SATS` | `1000` | Trigger auto-topup when API responses report balance below this threshold |
+| `ALBOM_NWC_TOPUP_USD` | `2.00` | USD amount to add for each automatic topup |
+| `ALBOM_NWC_MAX_DAILY` | `10.00` | Max USD the MCP client will auto-top up over a rolling 24h window |
 | `ALBOM_TOOL_PROFILE` | `compact` | Tool profile: `compact` or `full` |
 | `ALBOM_INCLUDE_MODERATION` | `false` (compact), `true` (full) | Include moderation tools |
 | `ALBOM_INCLUDE_EMBEDDINGS` | `false` (compact), `true` (full) | Include embedding tools |
@@ -113,6 +117,23 @@ curl -X POST https://402ai.net/api/v1/topup/claim \
   -d '{"preimage":"<hex-preimage>"}'
 ```
 
+### NWC Auto-Topup
+
+Set `ALBOM_NWC_URI` to a `nostr+walletconnect://...` URI to let the MCP client auto-pay topup invoices locally. The NWC secret stays in the MCP client process and is never sent to the 402ai server.
+
+When a tool response includes `balance_sats` or `available_sats` below `ALBOM_NWC_THRESHOLD_SATS`, the MCP client will:
+
+1. `POST /api/v1/topup` with `{"amount_usd": ALBOM_NWC_TOPUP_USD}`
+2. Pay the returned invoice over NWC with `pay_invoice`
+3. `POST /api/v1/topup/claim` with the returned preimage
+4. Update the in-memory bearer token if the claim returns a newer token
+
+Notes:
+
+- Auto-topup is client-side only. The NWC URI never touches the 402ai server.
+- `ALBOM_NWC_MAX_DAILY` is a rolling 24-hour USD spend cap for automatic topups.
+- Auto-topup does not bootstrap a brand new account by itself. Start with a valid `ALBOM_BEARER_TOKEN`, then NWC can keep that balance funded.
+
 ### No Token (L402 Flow)
 
 Without a token, calls will return `402 Payment Required` with a Lightning invoice. The MCP server will surface this as an error with payment details.
@@ -131,6 +152,10 @@ Add to `claude_desktop_config.json`:
       "args": ["/path/to/402ai-mcp/dist/server.js"],
       "env": {
         "ALBOM_BEARER_TOKEN": "abl_your_token_here",
+        "ALBOM_NWC_URI": "nostr+walletconnect://...",
+        "ALBOM_NWC_THRESHOLD_SATS": "1000",
+        "ALBOM_NWC_TOPUP_USD": "2.00",
+        "ALBOM_NWC_MAX_DAILY": "10.00",
         "ALBOM_TOOL_PROFILE": "compact"
       }
     }
@@ -160,6 +185,10 @@ await server.run();
 ```bash
 npm run build
 ```
+
+## Documentation Discipline
+
+Keep `ARCHITECTURE.md` and `WORKLOG.md` accurate when tool behavior, transport assumptions, auth flows, or deployment expectations change.
 
 ### Test
 
